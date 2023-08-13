@@ -1,7 +1,6 @@
-<script setup></script>
-
 <template>
-  <div>123</div>
+  <div class="bg-pink-500 w-20 h-20 flex items-center justify-center">123</div>
 </template>
 
-<style scoped></style>
+<script setup></script>
+<style></style>
