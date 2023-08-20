@@ -23,7 +23,7 @@ export function showFullLoading() {
 export function hideFullLoading() {
   nprogress.done();
 }
-
+//退出登录
 export function showModal(content = "提示内容", type = "warning", title = "") {
   return ElMessageBox.confirm(content, title, {
     confirmButtonText: "确认",
