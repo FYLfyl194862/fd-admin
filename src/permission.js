@@ -1,5 +1,5 @@
 import { getToken } from "~/composables/auth";
-import { toast } from "~/composables/util";
+import { toast, showFullLoading, hideFullLoading } from "~/composables/util";
 import router from "~/router";
 import store from "./store";
 // import store from "./store";
@@ -7,6 +7,8 @@ import store from "./store";
 // // 全局前置守卫
 // let hasGetInfo = false;
 router.beforeEach(async (to, from, next) => {
+  //显示loading
+  showFullLoading();
   //   console.log("全局前置守卫");
   const token = getToken();
   // 没有登录，强制跳转回登录页
@@ -25,7 +27,10 @@ router.beforeEach(async (to, from, next) => {
   }
   next();
 });
-
+//全局后置守卫
+router.afterEach((to, from) => {
+  hideFullLoading();
+});
 // getinfo().then((res) => {
 //   commit("SET_USERINFO", res);
 // });
