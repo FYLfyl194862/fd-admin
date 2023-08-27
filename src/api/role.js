@@ -1,9 +1,9 @@
 import axios from "~/axios";
-//获取公告列表
+//获取角色列表
 export function getRoleList(page) {
   return axios.get(`/admin/role/${page}`);
 }
-//新增公告
+//新增角色
 export function createRole(data) {
   return axios.post("/admin/role", data);
 }

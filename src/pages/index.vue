@@ -1,9 +1,5 @@
 <template>
-  <div>
-    后台首页
-    {{ $store.state.user.username }}
-    <el-button @click="handlelogout">退出登录</el-button>
-  </div>
+  <el-button @click="handlelogout">退出登录</el-button>
 </template>
 <script setup>
 import { useRouter } from "vue-router";

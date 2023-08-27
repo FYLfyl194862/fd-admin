@@ -79,131 +79,51 @@
 import { ref, reactive, computed } from "vue";
 import { Refresh } from "@element-plus/icons-vue";
 import FormDrawer from "~/components/FormDrawer.vue";
+import { useInitTable, useInitForm } from "~/composables/useCommon.js";
 import {
   getNoticeList,
   createNotice,
   updateNotice,
   deleteNotice,
 } from "~/api/notice";
-import { toast } from "~/composables/util";
-
-const tableData = ref([]);
-const loading = ref(false);
-
-// 分页
-const currentPage = ref(1);
-const total = ref(0);
-const limit = ref(10);
-
-// 获取数据
-function getData(p = null) {
-  if (typeof p == "number") {
-    currentPage.value = p;
-  }
-  loading.value = true;
-  getNoticeList(currentPage.value)
-    .then((res) => {
-      tableData.value = res.list;
-      total.value = res.totalCount;
-    })
-    .finally(() => {
-      loading.value = false;
-    });
-}
-
-getData();
-
-// 删除
-const handleDelete = (id) => {
-  loading.value = true;
-  deleteNotice(id)
-    .then((res) => {
-      toast("删除成功");
-      getData();
-    })
-    .finally(() => {
-      loading.value = false;
-    });
-};
-
-// 表单部分
-const formDrawerRef = ref(null);
-const formRef = ref(null);
-const form = reactive({
-  title: "",
-  content: "",
-});
-const rules = {
-  title: [
-    {
-      required: true,
-      message: "公告标题不能为空",
-      trigger: "blur",
-    },
-  ],
-  content: [
-    {
-      required: true,
-      message: "公告内容不能为空",
-      trigger: "blur",
-    },
-  ],
-};
-//标识ID，修改和新增公用一个submit
-const editId = ref(0); //如果有值就是修改，没有ID就是新增
-const drawerTitle = computed(() => (editId.value ? "修改" : "新增"));
-
-const handleSubmit = () => {
-  formRef.value.validate((valid) => {
-    if (!valid) return;
-
-    formDrawerRef.value.showLoading();
-    //判断当前是修改还是新增
-    const fun = editId.value
-      ? updateNotice(editId.value, form)
-      : createNotice(form);
-
-    fun
-      .then((res) => {
-        toast(drawerTitle.value + "成功");
-        // 修改刷新当前页，新增刷新第一页
-        getData(editId.value ? false : 1);
-        formDrawerRef.value.close();
-      })
-      .finally(() => {
-        formDrawerRef.value.hideLoading();
-      });
+const { tableData, loading, currentPage, total, limit, getData, handleDelete } =
+  useInitTable({
+    getList: getNoticeList,
+    delete: deleteNotice,
   });
-};
 
-// 重置表单
-function resetForm(row = false) {
-  if (formRef.value) formRef.value.clearValidate();
-  if (row) {
-    for (const key in form) {
-      form[key] = row[key];
-    }
-  }
-}
-// 新增
-const handleCreate = () => {
-  //如果是新增就为0
-  editId.value = 0;
-  resetForm();
-  resetForm({
+const {
+  formDrawerRef,
+  formRef,
+  form,
+  rules,
+  drawerTitle,
+  handleSubmit,
+  handleCreate,
+  handleEdit,
+} = useInitForm({
+  form: {
     title: "",
     content: "",
-  });
-  formDrawerRef.value.open();
-};
-
-// 编辑
-const handleEdit = (row) => {
-  //当前接受对象的id
-  editId.value = row.id;
-  resetForm(row);
-  formDrawerRef.value.open();
-  //修改的时候里面有值
-};
+  },
+  rules: {
+    title: [
+      {
+        required: true,
+        message: "公告标题不能为空",
+        trigger: "blur",
+      },
+    ],
+    content: [
+      {
+        required: true,
+        message: "公告内容不能为空",
+        trigger: "blur",
+      },
+    ],
+  },
+  getData,
+  update: updateNotice,
+  create: createNotice,
+});
 </script>
-<style></style>
