@@ -2,9 +2,9 @@ import axios from "axios";
 import { toast } from "~/composables/util";
 import { getToken } from "~/composables/auth";
 import store from "./store";
-
+//新建一个 axios 实例
 const service = axios.create({
-  baseURL: "/api",
+  baseURL: "/api", //接口前缀、域名
 });
 
 // 添加请求拦截器
@@ -12,10 +12,10 @@ service.interceptors.request.use(
   function (config) {
     // 往header头自动添加token
     const token = getToken();
+    // 有值情况条件下
     if (token) {
       config.headers["token"] = token;
     }
-
     return config;
   },
   function (error) {

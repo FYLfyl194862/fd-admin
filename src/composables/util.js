@@ -1,6 +1,6 @@
 import { ElNotification, ElMessageBox } from "element-plus";
 import nprogress from "nprogress";
-// 消息提示 成功提示
+// 消息成功提示
 export function toast(
   message,
   type = "success",
@@ -23,7 +23,7 @@ export function showFullLoading() {
 export function hideFullLoading() {
   nprogress.done();
 }
-//退出登录
+//退出登陆弹出框确认
 export function showModal(content = "提示内容", type = "warning", title = "") {
   return ElMessageBox.confirm(content, title, {
     confirmButtonText: "确认",

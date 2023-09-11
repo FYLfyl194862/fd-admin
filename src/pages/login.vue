@@ -1,11 +1,13 @@
 <template>
   <el-row class="login-container">
+    <!-- 左边 -->
     <el-col :lg="16" :md="12" class="left">
       <div>
         <div>欢迎光临</div>
-        <div>此站点是《vue3 + vite实战弗迪电池后台开发》</div>
+        <div>后台管理系统开发</div>
       </div>
     </el-col>
+    <!-- 右边 -->
     <el-col :lg="8" :md="12" class="right">
       <h2 class="title">欢迎回来</h2>
       <div>
@@ -17,7 +19,7 @@
         <el-form-item prop="username">
           <el-input v-model="form.username" placeholder="请输入用户名">
             <template #prefix>
-              <el-icon><user /></el-icon>
+              <el-icon><User /></el-icon>
             </template>
           </el-input>
         </el-form-item>
@@ -52,9 +54,8 @@
 <script setup>
 import { ref, reactive, onMounted, onBeforeUnmount } from "vue";
 import { toast } from "~/composables/util";
+//跳转
 import { useRouter } from "vue-router";
-// import { login } from "~/api/manager";
-// import { setToken } from "~/composables/auth";
 import { useStore } from "vuex";
 const router = useRouter();
 const store = useStore();
@@ -63,7 +64,6 @@ const form = reactive({
   username: "",
   password: "",
 });
-
 const rules = {
   username: [
     {
@@ -80,8 +80,9 @@ const rules = {
     },
   ],
 };
-
+//拿到el-form节点
 const formRef = ref(null);
+//进度条为true时就是加载状态，false就是正常状态
 const loading = ref(false);
 const onSubmit = () => {
   formRef.value.validate((valid) => {
@@ -89,10 +90,12 @@ const onSubmit = () => {
       return false;
     }
     loading.value = true;
+    //调用actions,
     store
       .dispatch("login", form)
       .then((res) => {
         toast("登录成功");
+        //跳转首页
         router.push("/");
       })
       .finally(() => {
@@ -120,14 +123,16 @@ const onSubmit = () => {
 };
 // 监听回车事件
 function onKeyUp(e) {
-  if (e.key == "Enter") onSubmit();
+  // console.log(e);
+  if (e.key == "Enter") {
+    onSubmit();
+  }
 }
-
-// 添加键盘监听
+// 添加键盘监听 keyup键盘按下事件  页面加载完毕
 onMounted(() => {
   document.addEventListener("keyup", onKeyUp);
 });
-// 移除键盘监听
+// 移除键盘监听  页面卸载之前
 onBeforeUnmount(() => {
   document.removeEventListener("keyup", onKeyUp);
 });

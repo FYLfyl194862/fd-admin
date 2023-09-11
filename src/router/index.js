@@ -1,3 +1,4 @@
+//引入创建路由和hash模式
 import { createRouter, createWebHashHistory } from "vue-router";
 import Index from "~/pages/index.vue";
 import NotFound from "~/pages/404.vue";
@@ -48,6 +49,6 @@ const routes = [
 ];
 const router = createRouter({
   history: createWebHashHistory(),
-  routes, // `routes: routes` 的缩写
+  routes: routes, // key值和value一样可以省略
 });
 export default router;

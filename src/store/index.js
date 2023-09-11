@@ -9,6 +9,7 @@ const store = createStore({
       user: {},
     };
   },
+  //修改用户相关信息
   mutations: {
     //记录用户信息
     SET_USERINFO(state, user) {
@@ -16,11 +17,12 @@ const store = createStore({
     },
   },
   actions: {
-    //登录
+    //登录 解构commit
     login({ commit }, { username, password }) {
       return new Promise((resolve, reject) => {
         login(username, password)
           .then((res) => {
+            //保存token
             setToken(res.token);
             resolve(res);
           })
@@ -42,7 +44,7 @@ const store = createStore({
     logout({ commit }) {
       // 移除cookie里的token
       removeToken();
-      // 清除当前用户状态 vuex
+      // 清除当前用户状态 vuex 把user清空
       commit("SET_USERINFO", {});
     },
   },
