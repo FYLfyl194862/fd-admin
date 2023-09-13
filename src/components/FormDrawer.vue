@@ -7,9 +7,11 @@
     :destroy-on-close="destroyOnClose"
   >
     <div class="formDrawer">
+      <!-- 表单部分 -->
       <div class="body">
         <slot></slot>
       </div>
+      <!-- 按钮部分 -->
       <div class="actions">
         <el-button type="primary" @click="submit" :loading="loading">{{
           confirmText
@@ -23,7 +25,7 @@
 import { ref } from "vue";
 
 const showDrawer = ref(false);
-
+//defineProps对外暴露属性
 const props = defineProps({
   title: String,
   size: {
@@ -41,6 +43,7 @@ const props = defineProps({
 });
 
 const loading = ref(false);
+//两个方法
 const showLoading = () => (loading.value = true);
 const hideLoading = () => (loading.value = false);
 
@@ -50,8 +53,9 @@ const open = () => (showDrawer.value = true);
 // 关闭
 const close = () => (showDrawer.value = false);
 
-// 提交
+// 提交 向外暴露事件
 const emit = defineEmits(["submit"]);
+//通知父组件执行submit
 const submit = () => emit("submit");
 
 // 向父组件暴露以下方法
@@ -79,6 +83,7 @@ defineExpose({
   bottom: 50px;
   overflow-y: auto;
 }
+/* 按钮mt-auto推到底部  overflow-y: auto超出滚动*/
 .formDrawer .actions {
   height: 50px;
   @apply mt-auto flex items-center;

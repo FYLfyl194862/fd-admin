@@ -9,7 +9,7 @@ import Admin from "~/layouts/admin.vue";
 import manage from "~/pages/manage.vue";
 const routes = [
   {
-    path: "/", //后台首页
+    path: "/",
     component: Admin,
     //子路由下面
     children: [
