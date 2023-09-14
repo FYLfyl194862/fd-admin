@@ -1,6 +1,7 @@
 <template>
   <div class="f-menu" :style="{ width: $store.state.asideWidth }">
     <el-menu
+      :default-active="defaultActive"
       default-active="2"
       class="border-0"
       :collapse="iscollapse"
@@ -36,7 +37,7 @@
 </template>
 <script setup>
 import { ref, computed } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { useStore } from "vuex";
 //数据
 const asideMenus = [
@@ -58,7 +59,10 @@ const asideMenus = [
   },
 ];
 const router = useRouter();
+const route = useRoute();
 const store = useStore();
+//默认选中
+const defaultActive = ref(route.path);
 //方法
 const handleSelect = (e) => {
   router.push(e);
