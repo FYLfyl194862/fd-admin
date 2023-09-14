@@ -40,24 +40,7 @@ import { ref, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useStore } from "vuex";
 //数据
-const asideMenus = [
-  {
-    name: "后台面板",
-    icon: "help",
-    child: [{ name: "主控台", frontpath: "/", icon: "home-filled" }],
-  },
-  {
-    name: "商城管理",
-    icon: "shopping-bag",
-    child: [
-      {
-        name: "商品管理",
-        frontpath: "/goods/list",
-        icon: "shopping-cart-full",
-      },
-    ],
-  },
-];
+
 const router = useRouter();
 const route = useRoute();
 const store = useStore();
@@ -71,6 +54,7 @@ const handleSelect = (e) => {
 const iscollapse = computed(() => {
   !(store.state.asideWidth == "250px");
 });
+const asideMenus = computed(() => store.state.menus);
 </script>
 <style>
 .f-menu {
@@ -81,5 +65,8 @@ const iscollapse = computed(() => {
   overflow-y: auto;
   overflow-x: hidden;
   @apply shadow-md fixed bg-light-50;
+}
+.f-menu::-webkit-scrollbar {
+  width: 0;
 }
 </style>

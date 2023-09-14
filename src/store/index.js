@@ -9,6 +9,8 @@ const store = createStore({
       user: {},
       //侧边宽度 默认展开状态
       asideWidth: "250px",
+      menus: [],
+      ruleNames: [],
     };
   },
   //修改用户相关信息
@@ -20,6 +22,12 @@ const store = createStore({
     //展开/缩起侧边
     handleAsideWidth(state) {
       state.asideWidth = state.asideWidth == "250px" ? "48px" : "250px";
+    },
+    SET_MENUS(state, menus) {
+      state.menus = menus;
+    },
+    SET_RULENAMES(state, ruleNames) {
+      state.ruleNames = ruleNames;
     },
   },
   actions: {
@@ -41,6 +49,8 @@ const store = createStore({
         getinfo()
           .then((res) => {
             commit("SET_USERINFO", res);
+            commit("SET_MENUS", res.menus);
+            commit("SET_RULENAMES", res.ruleNames);
             resolve(res);
           })
           .catch((err) => reject(err));
