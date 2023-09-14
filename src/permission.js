@@ -1,6 +1,6 @@
 import { getToken } from "~/composables/auth";
 import { toast, showFullLoading, hideFullLoading } from "~/composables/util";
-import router from "~/router";
+import { router, addRoutes } from "~/router";
 import store from "./store";
 
 // 全局前置守卫
@@ -20,14 +20,16 @@ router.beforeEach(async (to, from, next) => {
     return next({ path: from.path ? from.path : "/" });
   }
   //如果用户登陆了，自动获取用户信息，并存储在vuex 异步操作前面加await
+  let hasNewRoutes = false;
   if (token) {
-    await store.dispatch("getinfo");
+    let { menus } = await store.dispatch("getinfo");
+    hasNewRoutes = addRoutes(menus);
   }
   //设置页面标题
   let title = (to.meta.title ? to.meta.title : "") + "-后台管理系统";
   document.title = title;
   // console.log(to.meta.title);
-  next();
+  hasNewRoutes ? next(to.fullpath) : next();
 });
 //全局后置守卫 页面渲染完毕就会关闭login状态
 router.afterEach((to, from) => {

@@ -4,7 +4,7 @@ import App from "./App.vue";
 //引入ElementPlus及其样式
 import ElementPlus from "element-plus";
 import "element-plus/dist/index.css";
-import router from "./router";
+import { router } from "./router";
 import VueI18n from "./i18n/index";
 import store from "./store";
 //引入windicss库
