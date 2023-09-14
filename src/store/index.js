@@ -7,6 +7,8 @@ const store = createStore({
     return {
       //用户信息
       user: {},
+      //侧边宽度 默认展开状态
+      asideWidth: "250px",
     };
   },
   //修改用户相关信息
@@ -14,6 +16,10 @@ const store = createStore({
     //记录用户信息
     SET_USERINFO(state, user) {
       state.user = user;
+    },
+    //展开/缩起侧边
+    handleAsideWidth(state) {
+      state.asideWidth = state.asideWidth == "250px" ? "48px" : "250px";
     },
   },
   actions: {
