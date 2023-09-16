@@ -1,191 +1,142 @@
 <template>
   <div class="f-tag-list" :style="{ left: $store.state.asideWidth }">
     <el-tabs
-      v-model="editableTabsValue"
+      v-model="activeTab"
       type="card"
-      class="demo-tabs"
-      style="min-width: 100px"
-      closable
+      class="flex-1"
       @tab-remove="removeTab"
+      style="min-width: 100px"
+      @tab-change="changeTab"
     >
       <el-tab-pane
-        v-for="item in editableTabs"
-        :key="item.name"
+        :closable="item.path != '/'"
+        v-for="item in tabList"
+        :key="item.path"
         :label="item.title"
-        :name="item.name"
-      >
-      </el-tab-pane>
+        :name="item.path"
+      ></el-tab-pane>
     </el-tabs>
+
     <span class="tag-btn">
-      <el-dropdown>
+      <el-dropdown @command="handleClose">
         <span class="el-dropdown-link">
-          <el-icon class="el-icon--right">
+          <el-icon>
             <arrow-down />
           </el-icon>
         </span>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item>Action 1</el-dropdown-item>
-            <el-dropdown-item>Action 2</el-dropdown-item>
-            <el-dropdown-item>Action 3</el-dropdown-item>
-            <el-dropdown-item disabled>Action 4</el-dropdown-item>
-            <el-dropdown-item divided>Action 5</el-dropdown-item>
+            <el-dropdown-item command="clearOther">关闭其他</el-dropdown-item>
+            <el-dropdown-item command="clearAll">全部关闭</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
     </span>
   </div>
+  <div style="height: 44px"></div>
 </template>
 <script setup>
 import { ref } from "vue";
+import { useRoute, onBeforeRouteUpdate } from "vue-router";
+import { useCookies } from "@vueuse/integrations/useCookies";
+import { router } from "../../router";
+const route = useRoute();
+const cookie = useCookies();
 
-let tabIndex = 2;
-const editableTabsValue = ref("2");
-const editableTabs = ref([
+const activeTab = ref(route.path);
+const tabList = ref([
   {
-    title: "Tab 1",
-    name: "1",
-    content: "Tab 1 content",
-  },
-  {
-    title: "Tab 2",
-    name: "2",
-    content: "Tab 2 content",
-  },
-  {
-    title: "Tab 2",
-    name: "3",
-    content: "Tab 2 content",
-  },
-  {
-    title: "Tab 2",
-    name: "4",
-    content: "Tab 2 content",
-  },
-  {
-    title: "Tab 2",
-    name: "2",
-    content: "Tab 2 content",
-  },
-  {
-    title: "Tab 2",
-    name: "2",
-    content: "Tab 2 content",
-  },
-  {
-    title: "Tab 2",
-    name: "2",
-    content: "Tab 2 content",
-  },
-  {
-    title: "Tab 2",
-    name: "2",
-    content: "Tab 2 content",
-  },
-  {
-    title: "Tab 2",
-    name: "2",
-    content: "Tab 2 content",
-  },
-  {
-    title: "Tab 2",
-    name: "2",
-    content: "Tab 2 content",
-  },
-  {
-    title: "Tab 1",
-    name: "1",
-    content: "Tab 1 content",
-  },
-  {
-    title: "Tab 2",
-    name: "2",
-    content: "Tab 2 content",
-  },
-  {
-    title: "Tab 2",
-    name: "3",
-    content: "Tab 2 content",
-  },
-  {
-    title: "Tab 2",
-    name: "4",
-    content: "Tab 2 content",
-  },
-  {
-    title: "Tab 1",
-    name: "1",
-    content: "Tab 1 content",
-  },
-  {
-    title: "Tab 2",
-    name: "2",
-    content: "Tab 2 content",
-  },
-  {
-    title: "Tab 2",
-    name: "3",
-    content: "Tab 2 content",
-  },
-  {
-    title: "Tab 2",
-    name: "4",
-    content: "Tab 2 content",
+    title: "后台首页",
+    path: "/",
   },
 ]);
 
-const addTab = (targetName) => {
-  const newTabName = `${++tabIndex}`;
-  editableTabs.value.push({
-    title: "New Tab",
-    name: newTabName,
-    content: "New Tab content",
+// 添加标签导航
+function addTab(tab) {
+  let noTab = tabList.value.findIndex((t) => t.path == tab.path) == -1;
+  if (noTab) {
+    tabList.value.push(tab);
+  }
+
+  cookie.set("tabList", tabList.value);
+}
+
+// 初始化标签导航列表
+function initTabList() {
+  let tbs = cookie.get("tabList");
+  if (tbs) {
+    tabList.value = tbs;
+  }
+}
+
+initTabList();
+
+onBeforeRouteUpdate((to, from) => {
+  activeTab.value = to.path;
+  addTab({
+    title: to.meta.title,
+    path: to.path,
   });
-  editableTabsValue.value = newTabName;
+});
+
+const changeTab = (t) => {
+  activeTab.value = t;
+  router.push(t);
 };
-const removeTab = (targetName) => {
-  const tabs = editableTabs.value;
-  let activeName = editableTabsValue.value;
-  if (activeName === targetName) {
+
+const removeTab = (t) => {
+  let tabs = tabList.value;
+  let a = activeTab.value;
+  if (a == t) {
     tabs.forEach((tab, index) => {
-      if (tab.name === targetName) {
+      if (tab.path == t) {
         const nextTab = tabs[index + 1] || tabs[index - 1];
         if (nextTab) {
-          activeName = nextTab.name;
+          a = nextTab.path;
         }
       }
     });
   }
+  activeTab.value = a;
+  tabList.value = tabList.value.filter((tab) => tab.path != t);
 
-  editableTabsValue.value = activeName;
-  editableTabs.value = tabs.filter((tab) => tab.name !== targetName);
+  cookie.set("tabList", tabList.value);
+};
+const handleClose = (c) => {
+  if (c == "clearAll") {
+    //切换回首页
+    activeTab.value = "/";
+    //过滤只剩下首页
+    tabList.value = [
+      {
+        title: "后台首页",
+        path: "/",
+      },
+    ];
+  } else if (c == "clearOther") {
+    //过滤只剩下首页和当前激活
+    tabList.value = tabList.value.filter(
+      (tab) => tab.path == "/" || tab.path == activeTab.value
+    );
+  }
+  cookie.set("tabList", tabList.value);
 };
 </script>
 <style scoped>
 .f-tag-list {
-  position: fixed;
+  @apply fixed bg-gray-100 flex items-center px-2;
   top: 64px;
   right: 0;
   height: 44px;
-  display: flex;
-  background-color: #f3f4f6;
-  align-items: center;
   z-index: 100;
 }
 .tag-btn {
-  background-color: white;
+  @apply bg-white rounded ml-auto flex items-center justify-center px-2;
   height: 32px;
-  width: 32px;
-  border-radius: 0.25rem;
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
 }
 :deep(.el-tabs__header) {
-  margin-bottom: 0;
+  border: 0 !important;
+  @apply mb-0;
 }
 :deep(.el-tabs__nav) {
   border: 0 !important;
@@ -193,14 +144,16 @@ const removeTab = (targetName) => {
 :deep(.el-tabs__item) {
   border: 0 !important;
   height: 32px;
-  background-color: white;
-  margin-left: 0.25rem;
-  margin-right: 0.25rem;
   line-height: 32px;
-  border-radius: 0.25rem;
+  @apply bg-white mx-1 rounded;
+}
+:deep(.el-tabs__nav-next),
+:deep(.el-tabs__nav-prev) {
+  line-height: 32px;
+  height: 32px;
 }
 :deep(.is-disabled) {
-  background-color: #d1d5db;
   cursor: not-allowed;
+  @apply text-gray-300;
 }
 </style>
