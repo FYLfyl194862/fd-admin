@@ -4,7 +4,7 @@ import { router, addRoutes } from "~/router";
 import store from "./store";
 
 // 全局前置守卫
-// let hasGetInfo = false;
+let hasGetInfo = false;
 router.beforeEach(async (to, from, next) => {
   //显示loading
   showFullLoading();
@@ -21,8 +21,9 @@ router.beforeEach(async (to, from, next) => {
   }
   //如果用户登陆了，自动获取用户信息，并存储在vuex 异步操作前面加await
   let hasNewRoutes = false;
-  if (token) {
+  if (token && !hasGetInfo) {
     let { menus } = await store.dispatch("getinfo");
+    hasGetInfo = true;
     hasNewRoutes = addRoutes(menus);
   }
   //设置页面标题
