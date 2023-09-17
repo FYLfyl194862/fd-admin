@@ -9,4 +9,7 @@
   background-color: #f4f4f4 !important;
   height: 3px;
 }
+body {
+  background-color: #f4f4f4;
+}
 </style>
