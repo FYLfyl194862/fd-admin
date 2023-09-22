@@ -1,5 +1,5 @@
 <template>
-  <div class="aside-list" :class="{ active: true }">
+  <div class="aside-list" :class="{ active: active }">
     <span class="truncate"><slot /></span>
     <el-button
       size="small"
@@ -9,14 +9,18 @@
       @click="$emit('edit')"
       ><el-icon :size="12"><Edit /></el-icon
     ></el-button>
-    <el-button
-      size="small"
-      type="primary"
-      text
-      class="px-1"
+    <el-popconfirm
+      title="是否要删除该分类"
+      confirmButtonText="确认"
+      cancelButtonText="取消"
       @click="$emit('delete')"
-      ><el-icon :size="12"><CloseBold /></el-icon
-    ></el-button>
+    >
+      <template #reference>
+        <el-button size="small" type="primary" text class="px-1"
+          ><el-icon :size="12"><CloseBold /></el-icon
+        ></el-button>
+      </template>
+    </el-popconfirm>
   </div>
 </template>
 

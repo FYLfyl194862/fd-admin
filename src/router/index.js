@@ -103,7 +103,7 @@ const asyncRoutes = [
     name: "/notice/list",
     component: NoticeList,
     meta: {
-      title: "优惠劵列表",
+      title: "公告列表",
     },
   },
   {
