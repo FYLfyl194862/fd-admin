@@ -13,6 +13,7 @@ import ImageList from "~/pages/image/list.vue";
 import CouponList from "~/pages/coupon/list.vue";
 import SettingBase from "~/pages/setting/base.vue";
 import NoticeList from "~/pages/notice/list.vue";
+import ManagerList from "~/pages/manager/list.vue";
 const routes = [
   {
     path: "/",
@@ -112,6 +113,14 @@ const asyncRoutes = [
     component: SettingBase,
     meta: {
       title: "配置列表",
+    },
+  },
+  {
+    path: "/manager/list",
+    name: "/manager/list",
+    component: ManagerList,
+    meta: {
+      title: "管理员列表",
     },
   },
 ];
