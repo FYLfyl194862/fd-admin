@@ -22,8 +22,15 @@
       </el-row>
     </el-form>
     <div class="flex justify-between items-center mb-4">
-      <el-button type="primary" size="small">新增</el-button>
-      <el-tooltip effect="dark" content="刷新数据" placement="top">
+      <el-button type="primary" size="small" @click="handleCreate"
+        >新增</el-button
+      >
+      <el-tooltip
+        effect="dark"
+        content="刷新数据"
+        placement="top"
+        @click="getData"
+      >
         <el-button text
           ><el-icon><Refresh /></el-icon
         ></el-button>
@@ -64,45 +71,92 @@
           </el-switch>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center">
+      <el-table-column label="操作" align="center" width="360">
         <template #default="scope">
           <small class="text-sm text-gray-500" v-if="scope.row.super == 1"
             >暂无操作</small
           >
-          <el-button size="small" @click="handleEdit(scope.row)" text
-            >修改</el-button
-          >
-          <el-popconfirm title="确认要删除该管理员?">
-            <template #reference>
-              <el-button
-                text
-                size="small"
-                type="danger"
-                @click="handleDelete(scope.row.id)"
-                >删除</el-button
-              >
-            </template>
-          </el-popconfirm>
+          <div v-else>
+            <el-button size="small" @click="handleEdit(scope.row)" text
+              >修改</el-button
+            >
+            <el-popconfirm
+              title="确认要删除该管理员?"
+              confirmButtonText="确认"
+              cancelButtonText="取消"
+            >
+              <template #reference>
+                <el-button
+                  text
+                  size="small"
+                  type="danger"
+                  @click="handleDelete(scope.row.id)"
+                  >删除</el-button
+                >
+              </template>
+            </el-popconfirm>
+          </div>
         </template>
       </el-table-column>
     </el-table>
     <!-- 分页栏 -->
-    <el-pagination
-      :currentPage="currentPage"
-      :limit="limit"
-      background
-      layout="prev, pager, next"
-      :total="total"
-    />
+    <div class="flex items-center justify-center mt-5">
+      <el-pagination
+        v-model:currentPage="currentPage"
+        v-model:page-size="limit"
+        background
+        layout="prev, pager, next"
+        :total="total"
+        @current-change="getData"
+      />
+    </div>
+    <FormDrawer ref="formDrawerRef" @submit="handleSubmit" :title="drawerTitle">
+      <el-form :model="form" label-width="60px" ref="formRef">
+        <el-form-item label="用户名">
+          <el-input v-model="form.username" />
+        </el-form-item>
+        <el-form-item label="密码">
+          <el-input v-model="form.password" />
+        </el-form-item>
+        <el-form-item label="头像">
+          <el-upload
+            class="avatar-uploader"
+            action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+            :show-file-list="false"
+            :on-success="handleAvatarSuccess"
+            :before-upload="beforeAvatarUpload"
+          >
+            <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+            <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+          </el-upload>
+        </el-form-item>
+        <el-form-item label="所属管理员">
+          <el-select v-model="form.region" placeholder="请选择所属管理员">
+            <el-option label="Zone one" value="shanghai" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-switch v-model="form.status" />
+        </el-form-item>
+      </el-form>
+    </FormDrawer>
   </el-card>
 </template>
 
 <script setup>
-import { reactive, ref, toDisplayString } from "vue";
+import { reactive, ref, computed } from "vue";
 import { getManagerList, updateManagerStatus } from "~/api/manager.js";
 import { toast } from "~/composables/util.js";
+import FormDrawer from "~/components/FormDrawer.vue";
 const searchForm = reactive({
   keyword: "",
+});
+const form = reactive({
+  username: "",
+  password: "",
+  role_id: "",
+  status: "",
+  avatar: "",
 });
 //重置表单
 const resetSearchForm = () => {
@@ -114,6 +168,8 @@ const loading = ref(false);
 const total = ref(0);
 const limit = ref(10);
 const currentPage = ref(1);
+const formDrawerRef = ref(null);
+const formRef = ref(null);
 function getData(p = null) {
   if (typeof p == "number") {
     currentPage.value = p;
@@ -139,10 +195,57 @@ const handleStatusChange = (status, row) => {
   updateManagerStatus(row.id, status)
     .then((res) => {
       toast("修改状态成功");
+      getData();
     })
     .finally(() => {
       row.statusLoading = false;
     });
+};
+const editId = ref(0);
+const drawerTitle = computed(() => (editId.value ? "修改" : "新增"));
+//新增
+const handleCreate = () => {
+  editId.value = 0;
+  resetForm({
+    username: "",
+    password: "",
+    role_id: "",
+    status: "",
+    avatar: "",
+  });
+  formDrawerRef.value.open();
+};
+//重置表单
+function resetForm(row = false) {
+  if (formRef.value) formRef.value.clearValidate;
+  if (row) {
+    for (const key in form) {
+      form[key] = row[key];
+    }
+  }
+}
+const handleSubmit = () => {
+  formRef.value.validate((valid) => {
+    if (!valid) return;
+    formDrawerRef.value.showLoading();
+    const fun = editId.value
+      ? updateManager(currentPage.value, form)
+      : createManager(form);
+    fun
+      .then((res) => {
+        toast(drawerTitle.value + "成功");
+        getData();
+      })
+      .finally(() => {
+        formDrawerRef.value.hideLoading();
+      });
+  });
+};
+//修改
+const handleEdit = (row) => {
+  editId.value = row.id;
+  resetForm(row);
+  formDrawerRef.value.open();
 };
 </script>
 <style scoped></style>
