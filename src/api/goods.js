@@ -1,32 +1,28 @@
 import axios from "~/axios";
-//获取管理员列表
+import { queryParams } from "~/composables/util";
+//获取商品列表
 export function getGoodsList(page, query = {}) {
-  let q = [];
-  for (const key in query) {
-    if (query[key]) {
-      q.push(`${key}=${encodeURIComponent(query[key])}`);
-    }
-  }
-  let r = q.join("&");
-  r = r ? "?" + r : "";
-
-  return axios.get(`/admin/manager/${page}${r}`);
+  let r = queryParams(query);
+  return axios.get(`/admin/goods/${page}${r}`);
 }
-//新增管理员
+//新增商品
 export function createGoods(data) {
-  return axios.post(`/admin/manager`, data);
+  return axios.post(`/admin/goods`, data);
 }
-//删除管理员
-export function deleteGoods(id) {
-  return axios.post(`/admin/manager/${id}/delete`);
+//删除商品
+export function deleteGoods(ids) {
+  return axios.post(`/admin/goods/delete_all`, {
+    ids,
+  });
 }
-//修改管理员
+//修改商品
 export function updateGoods(id, data) {
-  return axios.post(`/admin/manager/${id}`, data);
+  return axios.post(`/admin/goods/${id}`, data);
 }
-//修改管理员状态
-export function updateGoods(id, status) {
-  return axios.post(`/admin/manager/${id}/update_status`, {
+//修改商品状态
+export function updateGoodsStatus(ids, status) {
+  return axios.post(`/admin/goods/changestatus`, {
+    ids,
     status,
   });
 }
