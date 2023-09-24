@@ -84,15 +84,10 @@
               title="确认要删除该管理员?"
               confirmButtonText="确认"
               cancelButtonText="取消"
+              @confirm="handleDelete(scope.row.id)"
             >
               <template #reference>
-                <el-button
-                  text
-                  size="small"
-                  type="danger"
-                  @click="handleDelete(scope.row.id)"
-                  >删除</el-button
-                >
+                <el-button text size="small" type="primary">删除</el-button>
               </template>
             </el-popconfirm>
           </div>
@@ -112,13 +107,13 @@
     </div>
     <FormDrawer ref="formDrawerRef" @submit="handleSubmit" :title="drawerTitle">
       <el-form :model="form" label-width="60px" ref="formRef">
-        <el-form-item label="用户名">
+        <el-form-item label="用户名" prop="username">
           <el-input v-model="form.username" />
         </el-form-item>
-        <el-form-item label="密码">
+        <el-form-item label="密码" prop="password">
           <el-input v-model="form.password" />
         </el-form-item>
-        <el-form-item label="头像">
+        <el-form-item label="头像" prop="avatar">
           <el-upload
             class="avatar-uploader"
             action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
@@ -130,13 +125,31 @@
             <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
           </el-upload>
         </el-form-item>
-        <el-form-item label="所属管理员">
-          <el-select v-model="form.region" placeholder="请选择所属管理员">
-            <el-option label="Zone one" value="shanghai" />
+        <el-form-item label="所属角色" prop="role_id">
+          <el-select
+            v-model="form.role_id"
+            value-key=""
+            placeholder="选择所属角色"
+            clearable
+            filterable
+            @change=""
+          >
+            <el-option
+              v-for="item in roles"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            >
+            </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="状态">
-          <el-switch v-model="form.status" />
+        <el-form-item label="状态" prop="status">
+          <el-switch
+            v-model="form.status"
+            :active-value="1"
+            :inactive-value="0"
+          >
+          </el-switch>
         </el-form-item>
       </el-form>
     </FormDrawer>
@@ -145,7 +158,13 @@
 
 <script setup>
 import { reactive, ref, computed } from "vue";
-import { getManagerList, updateManagerStatus } from "~/api/manager.js";
+import {
+  getManagerList,
+  updateManagerStatus,
+  deleteManager,
+  updateManager,
+  createManager,
+} from "~/api/manager.js";
 import { toast } from "~/composables/util.js";
 import FormDrawer from "~/components/FormDrawer.vue";
 const searchForm = reactive({
@@ -154,8 +173,8 @@ const searchForm = reactive({
 const form = reactive({
   username: "",
   password: "",
-  role_id: "",
-  status: "",
+  role_id: null,
+  status: 1,
   avatar: "",
 });
 //重置表单
@@ -163,6 +182,7 @@ const resetSearchForm = () => {
   searchForm.keyword = "";
   getData();
 };
+const roles = ref([]);
 const tableData = ref([]);
 const loading = ref(false);
 const total = ref(0);
@@ -177,12 +197,13 @@ function getData(p = null) {
   loading.value = true;
   getManagerList(currentPage.value, searchForm)
     .then((res) => {
-      //   console.log(res);
+      console.log(res);
       tableData.value = res.list.map((o) => {
         o.statusLoading = false;
         return o;
       });
       total.value = res.totalCount;
+      roles.value = res.roles;
     })
     .finally(() => {
       loading.value = false;
@@ -196,6 +217,7 @@ const handleStatusChange = (status, row) => {
     .then((res) => {
       toast("修改状态成功");
       getData();
+      formDrawerRef.value.close();
     })
     .finally(() => {
       row.statusLoading = false;
@@ -209,8 +231,8 @@ const handleCreate = () => {
   resetForm({
     username: "",
     password: "",
-    role_id: "",
-    status: "",
+    role_id: null,
+    status: 1,
     avatar: "",
   });
   formDrawerRef.value.open();
@@ -229,7 +251,7 @@ const handleSubmit = () => {
     if (!valid) return;
     formDrawerRef.value.showLoading();
     const fun = editId.value
-      ? updateManager(currentPage.value, form)
+      ? updateManager(editId.value, form)
       : createManager(form);
     fun
       .then((res) => {
@@ -246,6 +268,18 @@ const handleEdit = (row) => {
   editId.value = row.id;
   resetForm(row);
   formDrawerRef.value.open();
+};
+//删除
+const handleDelete = (id) => {
+  loading.value = true;
+  deleteManager(id)
+    .then((res) => {
+      toast("删除成功");
+      getData();
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 };
 </script>
 <style scoped></style>
