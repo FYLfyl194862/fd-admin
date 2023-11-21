@@ -9,6 +9,7 @@
 
 <script setup>
 import { reactive, ref } from "vue";
+import { getImageList } from "~/api/image.js";
 </script>
 <style scoped>
 .image-main {

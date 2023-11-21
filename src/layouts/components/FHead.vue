@@ -122,7 +122,7 @@ import {
   ArrowDown,
   Expand,
 } from "@element-plus/icons-vue";
-import { useRePassword, useLogout } from "~/components/useManager.js";
+import { useRePassword, useLogout } from "~/composables/useManager.js";
 //全屏
 import { useFullscreen } from "@vueuse/core";
 const {

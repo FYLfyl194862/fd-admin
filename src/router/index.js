@@ -14,6 +14,7 @@ import CouponList from "~/pages/coupon/list.vue";
 import SettingBase from "~/pages/setting/base.vue";
 import NoticeList from "~/pages/notice/list.vue";
 import ManagerList from "~/pages/manager/list.vue";
+import RoleList from "~/pages/role/list.vue";
 const routes = [
   {
     path: "/",
@@ -121,6 +122,14 @@ const asyncRoutes = [
     component: ManagerList,
     meta: {
       title: "管理员列表",
+    },
+  },
+  {
+    path: "/role/list",
+    name: "/role/list",
+    component: RoleList,
+    meta: {
+      title: "角色列表",
     },
   },
 ];
