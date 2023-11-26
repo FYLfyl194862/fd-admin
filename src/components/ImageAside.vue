@@ -6,6 +6,8 @@
         :key="index"
         :active="activeId == item.id"
         @edit="handleEdit(item)"
+        @delete="handleDelete(item.id)"
+        @click="handleChangeActiveId(item.id)"
         >{{ item.name }}</AsideList
       >
       <AsideList active>分类标题</AsideList>
@@ -41,13 +43,13 @@ import {
   getImageList,
   createImageClass,
   updateImageClass,
+  deleteImageClass,
 } from "~/api/image.js";
 import FormDrawer from "~/components/FormDrawer.vue";
 import { toast } from "~/composables/util.js";
 //加载动画
 const loading = ref(false);
 const list = ref([]);
-const activeId = ref(0);
 const total = ref(0);
 const currentPage = ref(1);
 const limit = ref(10);
@@ -81,7 +83,7 @@ function getData(p = null) {
       total.value = res.totalCount;
       let item = list.value[0];
       if (item) {
-        activeId.value = item.id;
+        handleChangeActiveId(item.id);
       }
     })
     .finally(() => {
@@ -118,12 +120,33 @@ const handleCreate = () => {
 };
 /** 修改图库分类 **/
 const handleEdit = (row) => {
-  // console.log(row);
+  console.log(row);
   editId.value = row.id;
   form.name = row.name;
   form.order = row.order;
   formDrawerRef.value.open();
 };
+/** 删除图库分类 **/
+const handleDelete = (id) => {
+  console.log(id);
+  loading.value = true;
+  deleteImageClass(id)
+    .then((res) => {
+      console.log(res);
+      toast("删除成功");
+      getData();
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+};
+/** 选中图库分类 **/
+const activeId = ref(0);
+const emit = defineEmits(["change"]);
+function handleChangeActiveId(id) {
+  activeId.value = id;
+  emit("change", id);
+}
 defineExpose({
   handleCreate,
 });

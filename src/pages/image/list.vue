@@ -4,10 +4,13 @@
       <el-button type="primary" size="small" @click="handleCreate"
         >新增图片分类</el-button
       >
+      <el-button type="warning" size="small" @click="handleUploadImage"
+        >上传图片</el-button
+      >
     </el-header>
     <el-container>
-      <ImageAside ref="imageAsideRef"></ImageAside>
-      <ImageMain></ImageMain>
+      <ImageAside ref="imageAsideRef" @change="handleAsideChange" />
+      <ImageMain ref="imageMainRef" />
     </el-container>
   </el-container>
 </template>
@@ -19,9 +22,17 @@ import ImageMain from "~/components/ImageMain.vue";
 const windowHeight = window.innerHeight || document.body.clientHeight;
 const h = windowHeight - 64 - 44 - 40;
 const imageAsideRef = ref(null);
-
+const imageMainRef = ref(null);
 const handleCreate = () => {
   imageAsideRef.value.handleCreate();
+};
+
+const handleAsideChange = (image_class_id) => {
+  // console.log(image_class_id);
+  imageMainRef.value.loadData(image_class_id);
+};
+const handleUploadImage = () => {
+  imageMainRef.value.openUploadFile();
 };
 </script>
 <style scoped>
